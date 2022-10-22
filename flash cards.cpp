@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <string>
 #include <vector> // self explanatory
 #include <fstream>
@@ -26,7 +26,7 @@ using std::cout; using std::cin; using std::string; using std::vector; using std
 // a silly indeed
 
 // finished on 10/22/2022
-// 962 lines!!!!!!
+// 963 lines!!!!!!
 // my longest and most ambitious project yet™️
 // this is beginning to get hard to read, even for me
 // added save feature, i'm surprised it didn't error too much
@@ -43,7 +43,7 @@ vector<string> answers{ "yes", "no", "no", "yes" };
 string colorsList[]{ "black", "blue", "green", "aqua", "red", "purple", "yellow", "white", "gray", "light blue", "light green", "light aqua", "light red", "light purple", "light yellow", "bright white" };
 
 int cardsAmount{ 10 }; // 10 being the preset value
-int cardsLeft{ cardsAmount };
+int cardsLeft{ cardsAmount }; // set to 1 so it doesn't automatically die
 int lastCard{};
 
 int correctCards{};
@@ -262,6 +262,7 @@ void displayRandomCard()
 			cout << "> ";
 			getline(cin >> ws, input);
 
+			lastCard = random;
 			cardsLeft--;
 
 			int correctCharacters{};
@@ -354,12 +355,12 @@ void loadFlashCards()
 		{
 			if (line[0] == '!')
 			{
-				line.erase(0);
+				line = line.substr(1, line.length());
 				questions.push_back(line);
 			}
 			else if (line[0] == '@')
 			{
-				line.erase(0);
+				line = line.substr(1, line.length());
 				answers.push_back(line);
 			}
 		}
@@ -612,8 +613,7 @@ void removeAllCards()
 
 	string response{};
 
-	cout << "are you sure you want to remove all of your flash cards?\n";
-	cout << "(WARNING: THIS WILL REMOVE ALL OF THE FLASH CARDS IN YOUR SAVE TOO)\n\n";
+	cout << "are you sure you want to remove all of your flash cards?\n\n";
 
 	cout << "> ";
 	getline(cin >> ws, response);
@@ -622,8 +622,6 @@ void removeAllCards()
 	{
 		questions.clear();
 		answers.clear();
-
-		saveFlashCards();
 
 		clear();
 
@@ -639,6 +637,28 @@ void removeAllCards()
 	}
 }
 
+void changeFlashCardAmount()
+{
+	clear();
+	title("flash cards - change flash card amount");
+
+	cout << "input new amount: \n\n";
+
+	cout << "> ";
+	cin >> cardsAmount;
+
+	cardsLeft = cardsAmount;
+
+	clear();
+
+	cout << "changed flash cards amount to " << cardsAmount << "\n\n";
+	cout << "> ";
+
+	sleep(2);
+	returnTo("flashCardMenu");
+}
+
+
 // ------- \\
 
 void flashCardMenu()
@@ -650,11 +670,12 @@ void flashCardMenu()
 
 	cout << "flash card menu\n\n";
 
-	cout << "1. add a card\n";
-	cout << "2. remove a card\n";
-	cout << "3. save card menu\n";
+	cout << "1. save card menu\n";
+	cout << "2. add a card\n";
+	cout << "3. remove a card\n";
 	cout << "4. remove all cards\n";
-	cout << "5. back\n\n";
+	cout << "5. change card amount\n";
+	cout << "6. back\n\n";
 
 	cout << "> ";
 	cin >> response;
@@ -662,15 +683,15 @@ void flashCardMenu()
 	switch (response)
 	{
 	case '1':
-		addFlashCard();
+		saveFlashCardsMenu();
 		break;
 
 	case '2':
-		removeFlashCard();
+		addFlashCard();
 		break;
 
 	case '3':
-		saveFlashCardsMenu();
+		removeFlashCard();
 		break;
 
 	case '4':
@@ -678,6 +699,10 @@ void flashCardMenu()
 		break;
 
 	case '5':
+		changeFlashCardAmount();
+		break;
+
+	case '6':
 		returnTo("menu");
 		break;
 
@@ -784,25 +809,6 @@ void resetSettings()
 	returnTo("settings");
 }
 
-void changeFlashCardAmount()
-{
-	clear();
-	title("flash cards - change flash card amount");
-
-	cout << "input new amount: \n\n";
-
-	cout << "> ";
-	cin >> cardsAmount;
-
-	clear();
-
-	cout << "changed flash cards amount to " << cardsAmount << "\n\n";
-	cout << "> ";
-		
-	sleep(2);
-	returnTo("settings");
-}
-
 void settings()
 {
 	clear();
@@ -810,10 +816,9 @@ void settings()
 
 	char response{};
 
-	cout << "1. change flash card amount\n";
-	cout << "2. change color\n";
-	cout << "3. reset settings\n";
-	cout << "4. back\n\n";
+	cout << "1. change color\n";
+	cout << "2. reset settings\n";
+	cout << "3. back\n\n";
 
 	cout << "> ";
 	cin >> response;
@@ -821,23 +826,19 @@ void settings()
 	switch (response)
 	{
 	case '1':
-		changeFlashCardAmount();
-		break;
-
-	case '2':
 		changeColorMenu();
 		break;
 
-	case '3':
+	case '2':
 		resetSettings();
 		break;
 
-	case '4':
+	case '3':
 		returnTo("menu");
 		break;
 
 	default:
-		invalidInput("invalid input: please specify 1, 2, 3, or 4", "settings");
+		invalidInput("invalid input: please specify 1, 2, or 3", "settings");
 	}
 }
 
